@@ -1,0 +1,41 @@
+# Ignore the virtual environment directory
+venv/
+.env
+.venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+eggs/
+eggs-info/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Installer logs
+pip-wheel-metadata/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# VS Code settings
+.vscode/
+
+# PyCharm settings
+.idea/
+
+# Mac OS X system files
+.DS_Store
+
+# Logs
+*.log
