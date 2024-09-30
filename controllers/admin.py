@@ -2,6 +2,7 @@ from tables import DBConnectionManager, Admin, Event, User
 from util.exception import PecfestException
 from util.loggerSetup import logger
 
+
 def login(body):
     with DBConnectionManager() as session:
         if not body.get('username'):
