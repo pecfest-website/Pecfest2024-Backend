@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from tables import User, DBConnectionManager
 from flask_cors import CORS
 from controllers import user
+from controllers import admin
 from util.decorator import general
 from util.exception import PecfestException
 from dotenv import load_dotenv
@@ -23,6 +24,29 @@ def handle_global_exception(error):
     }), 200
 
 # ---------------------- ADMIN Routes --------------------------
+@app.route('/admin/login', methods=['POST'])
+@general(logReq = True, checkToken=False)
+def login_admin(body, *args, **kwargs):
+    result = admin.login(body)
+    return result, 200
+
+@app.route('/admin/list', methods=['GET'])
+@general(logReq = True, checkToken=False)
+def list_admins(*args, **kwargs):
+    result = admin.list_admins()
+    return result, 200
+
+@app.route('/admin/add/event', methods=['POST'])
+@general(logReq = True, checkToken=False)
+def add_event(body, *args, **kwargs):
+    result = admin.add_event(body)
+    return result, 200
+
+@app.route('/admin/event/detail', methods=['POST'])
+@general(logReq = True, checkToken=False)
+def event_detail(body, *args, **kwargs):
+    result = admin.event_detail(body)
+    return result, 200
 
 # ----------------------- EVENT Routes --------------------------
 

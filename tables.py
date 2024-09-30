@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from datetime import datetime
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 DBUSER=os.getenv("DBUSER")
@@ -17,6 +18,23 @@ class User(Base):
     id:int = Column(Integer, primary_key=True)
     name:str = Column(String)
 
+@dataclass
+class Admin(Base):
+    __tablename__ = 'admins'
+    id:int = Column(Integer, primary_key=True)
+    name:str = Column(String)
+
+@dataclass
+class Event(Base):
+    __tablename__ = 'events'
+    id: int = Column(Integer, primary_key=True)
+    name: str = Column(String)
+    date: datetime = Column(DateTime)
+    time: str = Column(String) # image url
+    image: str = Column(String)
+    heads: str = Column(String)  
+    tags: str = Column(String)  
+    description: str = Column(String)
 
 
 Session = sessionmaker(bind=engine)
