@@ -6,6 +6,7 @@ from controllers import admin
 from util.decorator import general
 from util.exception import PecfestException
 from dotenv import load_dotenv
+from util.loggerSetup import logger
 
 load_dotenv()
 app = Flask(__name__)
@@ -31,10 +32,16 @@ def login_admin(body, *args, **kwargs):
     return result, 200
 
 @app.route('/admin/list', methods=['GET'])
-@general(logReq = True, checkToken=False)
+@general(logReq=True, checkToken=False)
 def list_admins(*args, **kwargs):
-    result = admin.list_admins()
-    return result, 200
+    logger.debug("Entering list_admins endpoint")
+    try:
+        result = admin.list_admins()
+        logger.debug(f"Result from admin.list_admins: {result}")
+        return result, 200
+    except Exception as e:
+        logger.error(f"Error occurred in list_admins endpoint: {e}")
+        return {"status": "FAILURE", "responseCode": 500, "message": "Internal server error"}, 500
 
 @app.route('/admin/add/event', methods=['POST'])
 @general(logReq = True, checkToken=False)

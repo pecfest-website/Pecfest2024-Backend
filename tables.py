@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text
 from datetime import datetime
 from sqlalchemy.orm import declarative_base, sessionmaker
 
@@ -21,20 +21,31 @@ class User(Base):
 @dataclass
 class Admin(Base):
     __tablename__ = 'admins'
-    id:int = Column(Integer, primary_key=True)
-    name:str = Column(String)
+    id: int = Column(Integer, primary_key=True)
+    username: str = Column(String, unique=True, nullable=False)
+    password: str = Column(String, nullable=False)
+    created_at: datetime = Column(DateTime, default=datetime.now)
+    poster_link: str = Column(String)
 
 @dataclass
 class Event(Base):
     __tablename__ = 'events'
     id: int = Column(Integer, primary_key=True)
-    name: str = Column(String)
-    date: datetime = Column(DateTime)
-    time: str = Column(String) # image url
-    image: str = Column(String)
-    heads: str = Column(String)  
-    tags: str = Column(String)  
-    description: str = Column(String)
+    name: str = Column(String, nullable=False)
+    description: str = Column(Text)
+    startdate: datetime = Column(DateTime, nullable=False)
+    starttime: str = Column(String, nullable=False)
+    enddate: datetime = Column(DateTime, nullable=False)
+    endtime: str = Column(String, nullable=False)
+    venue: str = Column(String, nullable=False)
+    eventtype: str = Column(String)
+    minparticipants: int = Column(Integer)
+    maxparticipants: int = Column(Integer)
+    registrationfee: float = Column(String, nullable=False)
+    rulebooklink: str = Column(String)
+    heads: str = Column(Text, nullable=False)  
+    tags: str = Column(Text, nullable=False)   
+    image: str = Column(String, nullable=True)  # Image URL, can be null
 
 
 Session = sessionmaker(bind=engine)

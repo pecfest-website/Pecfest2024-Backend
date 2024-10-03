@@ -12,9 +12,15 @@ def login(body):
         
         try:
             admin = session.query(Admin).filter_by(username=body["username"]).first()
-            if admin and admin.password == body["password"]:
-                return {"status": "SUCCESS", "responseCode": 200, "message": "Login successful"}
+            if admin:
+                logger.info(f"Admin found: {admin.username}")
+                if admin.password == body["password"]:
+                    return {"status": "SUCCESS", "responseCode": 200, "message": "Login successful"}
+                else:
+                    logger.info(f"Password mismatch: {admin.password} != {body['password']}")
+                    return {"status": "FAILURE", "responseCode": 401, "message": "Invalid credentials"}
             else:
+                logger.info(f"No admin found with username: {body['username']}")
                 return {"status": "FAILURE", "responseCode": 401, "message": "Invalid credentials"}
         except Exception as e:
             logger.error(f"Err occurred in login: {e}")
@@ -23,59 +29,75 @@ def login(body):
 def list_admins():
     with DBConnectionManager() as session:
         try:
+            logger.debug("Opening DB session")
+            with DBConnectionManager() as session:
+                logger.debug("Session opened successfully.")
+            logger.debug("Querying all admins from the database.")
             admins = session.query(Admin).all()
-            admin_list = [
-                {
-                    "name": admin.username,
-                    "date": admin.created_at.strftime("%Y-%m-%d"),
-                    "time": admin.created_at.strftime("%H:%M:%S"),
+            logger.debug(f"Number of admins retrieved: {len(admins)}")
+            
+            admin_list = []
+            for admin in admins:
+                logger.debug(f"Processing admin: {admin.username}")
+                admin_list.append({
+                    "username": admin.username,
+                    "created_at": admin.created_at.strftime("%Y-%m-%d %H:%M:%S") if admin.created_at else None,
                     "poster_link": admin.poster_link
-                } for admin in admins
-            ]
+                })
+            
+            logger.debug(f"Admin list created: {admin_list}")
             return {"status": "SUCCESS", "responseCode": 200, "message": "Admins retrieved successfully", "data": admin_list}
         except Exception as e:
             logger.error(f"Err occurred in list_admins: {e}")
             return {"status": "FAILURE", "responseCode": 500, "message": "Internal server error"}
-        
+
 def add_event(body):
     with DBConnectionManager() as session:
-        if not body.get('name'):
-            return {"status": "FAILURE", "responseCode": 301, "message": "Please provide event name"}
-        if not body.get('date'):
-            return {"status": "FAILURE", "responseCode": 301, "message": "Please provide event date"}
-        if not body.get('time'):
-            return {"status": "FAILURE", "responseCode": 301, "message": "Please provide event time"}
-        if not body.get('image'):
-            return {"status": "FAILURE", "responseCode": 301, "message": "Please provide event image"}
-        if not body.get('heads'):
-            return {"status": "FAILURE", "responseCode": 301, "message": "Please provide event heads"}
-        if not body.get('tags'):
-            return {"status": "FAILURE", "responseCode": 301, "message": "Please provide event tags"}
-        if not body.get('description'):
-            return {"status": "FAILURE", "responseCode": 301, "message": "Please provide event description"}
-
+        required_fields = [
+            'name', 'description', 'startdate', 'starttime', 'enddate', 'endtime',
+            'venue', 'eventtype', 'minparticipants', 'maxparticipants', 'registrationfee',
+            'heads', 'tags'
+        ]
+        
+        for field in required_fields:
+            if not body.get(field):
+                logger.debug(f"Missing required field: {field}")
+                return {"status": "FAILURE", "responseCode": 301, "message": f"Please provide {field}"}
+        
         try:
+            logger.debug("Creating new event with provided details.")
             new_event = Event(
                 name=body["name"],
-                date=body["date"],
-                time=body["time"],
-                image=body["image"],
-                heads=body["heads"],
-                tags=body["tags"],
-                description=body["description"]
+                description=body["description"],
+                startdate=body["startdate"],
+                starttime=body["starttime"],
+                enddate=body["enddate"],
+                endtime=body["endtime"],
+                venue=body["venue"],
+                eventtype=body["eventtype"],
+                minparticipants=body["minparticipants"],
+                maxparticipants=body["maxparticipants"],
+                registrationfee=body["registrationfee"],
+                rulebooklink=body.get("rulebooklink"),
+                heads=body["heads"],  
+                tags=body["tags"],    
+                image=body.get("image")
             )
+            logger.debug(f"New event created: {new_event}")
             session.add(new_event)
             session.commit()
+            logger.debug("Event added to the database successfully.")
             return {"status": "SUCCESS", "responseCode": 200, "message": "Event added successfully"}
         except Exception as e:
-            logger.error(f"Err occurred in add_event: {e}")
+            logger.error(f"Error occurred in add_event: {e}")
             return {"status": "FAILURE", "responseCode": 500, "message": "Internal server error"}
         
 def event_detail(body):
     with DBConnectionManager() as session:
         try:
             filters = body.get('filters', {})
-            query = session.query(User).join(Event, User.event_id == Event.id)
+            # query = session.query(Event).join(Event, Event.event_id == Event.id)
+            query = session.query(Event)
             
             if 'event_id' in filters:
                 query = query.filter(Event.id == filters['event_id'])
