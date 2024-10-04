@@ -36,6 +36,12 @@ def createSponserType(body, *args, **kwargs):
     result = sponser.addType(body)
     return result, 201
 
+@app.route('/admin/sponser/add', methods=['PATCH']) 
+@general(logReq=True, checkToken=True)
+def addSponser(body, *args, **kwargs):
+    result = sponser.addSponser(body)
+    return result, 200
+
 # ------------------------ USER Routes ----------------------------
 @app.route('/users/create', methods=['GET'])
 @general(logReq = True, checkToken = True)
