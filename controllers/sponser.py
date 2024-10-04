@@ -3,11 +3,13 @@ from util.exception import PecfestException
 from util.loggerSetup import logger
 from util.gcb import uploadToGcs
 
-def multiplePhotos(Session, images):
+def multiplePhotos(Session, images, name, typeId):
+    if not images:
+        return
     for image in images:
         print(image.filename)
         link = uploadToGcs(image,"/sponser/{name}/{image.filename}")
-        sponser = Sponser(link= link,typeId=sponserType.id)
+        sponser = Sponser(link= link,typeId=typeId)
         session.add(sponser)
 
 def addType(body):
@@ -22,7 +24,8 @@ def addType(body):
             session.commit()
 
             images = body.get("photos")
-            multiplePhotos(session, images)
+            if images:
+                multiplePhotos(session, images, name, sponserType.id)
             session.commit()
         except Exception as e:
             logger.info(f"Err: Add Sponser type {e}")
@@ -40,8 +43,17 @@ def addSponser(body):
             for sponser in sponsers:
                 sponser.isDeleted = True
 
-        if added and len(added):
-            multiplePhotos(session, added)
+        if added:
+            name = added.get("typeName")
+            if not name:
+                raise PecfestException(statusCode=301, message="Please provide Sponser Type name")
+            id = added.get("typeId")
+            if not id:
+                raise PecfestException(statusCode=301, message="Please provide Sponser type id")
+            images = added.get("images")
+            if not images or not len(images):
+                raise PecfestException(statusCode=301, message="Please provide sponsers image")
+            multiplePhotos(session, images, name, id)
 
         session.commit()
     
