@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+from typing import List
 from datetime import datetime
 from enum import Enum
 from sqlalchemy.sql import func
@@ -104,8 +105,8 @@ class Event(Base):
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
-    heads: Mapped[list[Head]] = relationship("Head", back_populates="event", cascade="all, delete-orphan")
-    participants: Mapped[list[Participant]] = relationship("Participant", back_populates="event")
+    heads: Mapped[List[Head]] = relationship("Head", back_populates="event", cascade="all, delete-orphan")
+    participants: Mapped[List[Participant]] = relationship("Participant", back_populates="event")
 
 class MemberTypeEnum(Enum):
     INVITED = "invited"
@@ -131,7 +132,7 @@ class Team(Base):
     teamName: str = Column(String, nullable=False)
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
-    members: Mapped[list[TeamMember]] = relationship("TeamMember", back_populates="team")
+    members: Mapped[List[TeamMember]] = relationship("TeamMember", back_populates="team")
 
 @dataclass
 class Sponser(Base):
@@ -154,7 +155,7 @@ class SponserType(Base):
     priorty: int = Column(Integer, nullable = False, default=1)
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
-    sponsers: Mapped[list[Sponser]] = relationship("Sponser", back_populates="sponserType")
+    sponsers: Mapped[List[Sponser]] = relationship("Sponser", back_populates="sponserType")
 
 Session = sessionmaker(bind=engine)
 
