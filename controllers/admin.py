@@ -81,7 +81,7 @@ def addEvent(body):
                 image=body.get("image"),
                 participationType=body["participationType"],
                 paymentType=body["paymentType"],
-                ruleBookType=body["ruleBookType"] == 'true',
+                haveRuleBook=body["ruleBookType"] == 'true',
                 adminId=body["adminId"]
             )
             logger.debug(f"New event created: {new_event}")
