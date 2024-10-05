@@ -1,6 +1,16 @@
 import os
 from google.cloud import storage
 
+def uploadImage(image,name,type='sponser'):
+    if image.startswith('data:image/'):
+        header, image = image.split(';base64,')
+    image_data = base64.b64decode(image)
+    image_file = BytesIO(image_data)
+
+    blob_name = f"{type}/{name}/uploaded_image.jpg"
+    link = uploadToGcs(image_file, blob_name)
+    return link
+
 def uploadToGcs(file, destinationBlobName):
     storageClient = storage.Client()
     bucket = storageClient.bucket("pecfest")

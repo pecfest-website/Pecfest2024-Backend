@@ -4,6 +4,7 @@ from util.loggerSetup import logger
 from flask import make_response, jsonify
 from controllers.user import generateToken
 from controllers.event import listEvent
+from util.gcb import uploadImage
 import redis
 import json
 
@@ -51,7 +52,7 @@ def addEvent(body):
         required_fields = [
             'name', 'description', 'startdate', 'starttime', 'enddate', 'endtime',
             'venue', 'eventtype', 'minparticipants', 'maxparticipants', 'registrationfee',
-            'heads', 'tags', 'participationType', 'paymentType', 'ruleBookType', 'adminId'
+            'heads', 'tags', 'participationType', 'paymentType', 'ruleBookType', 'adminId', 'image'
         ]
         
         for field in required_fields:
@@ -59,6 +60,7 @@ def addEvent(body):
                 logger.debug(f"Missing required field: {field}")
                 raise PecfestException(statusCode=301, message=f"Please provide {field}")
 
+        link = uploadImage(body['image'], body['type'], "event")
         heads = [Head(name=head["name"], phoneNumber=head["contact"]) for head in body["heads"]]
         
         try:
@@ -82,7 +84,8 @@ def addEvent(body):
                 participationType=body["participationType"],
                 paymentType=body["paymentType"],
                 haveRuleBook=body["ruleBookType"] == 'true',
-                adminId=body["adminId"]
+                adminId=body["adminId"],
+                image=link
             )
             logger.debug(f"New event created: {new_event}")
             session.add(new_event)
