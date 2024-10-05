@@ -2,6 +2,7 @@ from flask import request
 from util.loggerSetup import logger
 from util.exception import PecfestException
 import redis
+import json
 
 redisClient = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
 
@@ -9,7 +10,8 @@ def tokenChecker(token):
     try:
         token = token.split(" ")[1]
         user = redisClient.get(token)
-        return user
+
+        return json.loads(user)
     except Exception as e:
         logger.error(f"invalid token , {e}")
         raise PecfestException(statusCode=403, message="Invalid token provided")
