@@ -31,26 +31,21 @@ def login_admin(body, *args, **kwargs):
     result = admin.login(body)
     return result, 200
 
-@app.route('/admin/list', methods=['GET'])
-@general(logReq=True, checkToken=False)
+@app.route('/admin/event/list', methods=['POST'])
+@general(logReq=True, checkToken=True)
 def list_admins(*args, **kwargs):
-    logger.debug("Entering list_admins endpoint")
-    try:
-        result = admin.list_admins()
-        logger.debug(f"Result from admin.list_admins: {result}")
-        return result, 200
-    except Exception as e:
-        logger.error(f"Error occurred in list_admins endpoint: {e}")
-        return {"status": "FAILURE", "responseCode": 500, "message": "Internal server error"}, 500
-
-@app.route('/admin/add/event', methods=['POST'])
-@general(logReq = True, checkToken=False)
+    admin_id = request.cookies.get('admin_id')
+    result = admin.list_admins(admin_id)
+    return result, 200
+    
+@app.route('/admin/event/add', methods=['POST'])
+@general(logReq = True, checkToken=True)
 def add_event(body, *args, **kwargs):
     result = admin.add_event(body)
     return result, 200
 
 @app.route('/admin/event/detail', methods=['POST'])
-@general(logReq = True, checkToken=False)
+@general(logReq = True, checkToken=True)
 def event_detail(body, *args, **kwargs):
     result = admin.event_detail(body)
     return result, 200

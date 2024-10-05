@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text, func, ForeignKey
 from datetime import datetime
 from sqlalchemy.orm import declarative_base, sessionmaker
 
@@ -24,8 +24,8 @@ class Admin(Base):
     id: int = Column(Integer, primary_key=True)
     username: str = Column(String, unique=True, nullable=False)
     password: str = Column(String, nullable=False)
-    created_at: datetime = Column(DateTime, default=datetime.now)
-    poster_link: str = Column(String)
+    createdAt = Column(DateTime, default=func.now(), nullable=False)
+    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
 @dataclass
 class Event(Base):
@@ -43,9 +43,19 @@ class Event(Base):
     maxparticipants: int = Column(Integer)
     registrationfee: float = Column(String, nullable=False)
     rulebooklink: str = Column(String)
+    # To handle heads as a list of objects containing headName and 
+    # headPhoneNumber, and tags as a list of tags,
+    # JSON serialization can be used.
+    # Eg: 
+    # tags_list = ["technology", "talk", "seminar"]
+    # new_event.set_tags(tags_list)
     heads: str = Column(Text, nullable=False)  
     tags: str = Column(Text, nullable=False)   
     image: str = Column(String, nullable=True)  # Image URL, can be null
+    participationType: str = Column(String, nullable=False)
+    paymentType: str = Column(String, nullable=False)
+    ruleBookType: str = Column(String, nullable=False)
+    adminId: int = Column(Integer, ForeignKey('admins.id'), nullable=False)  # Foreign key to Admin table
 
 
 Session = sessionmaker(bind=engine)
