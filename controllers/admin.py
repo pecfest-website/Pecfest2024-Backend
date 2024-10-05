@@ -25,7 +25,7 @@ def login(body):
         if admin.password != password:
             raise PecfestException(statusCode=401, message="Invalid password")
 
-        token = generateToken(admin.uuid)
+        token = generateToken(admin.password)
         redisClient.set(token, json.dumps(admin.to_dict()))  # Assuming `redisClient` is available
 
         return {
