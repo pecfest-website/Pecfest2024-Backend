@@ -58,6 +58,8 @@ def addEvent(body):
             if not body.get(field):
                 logger.debug(f"Missing required field: {field}")
                 raise PecfestException(statusCode=301, message=f"Please provide {field}")
+
+        heads = [Head(name=head["name"], phoneNumber=head["contact"]) for head in body["heads"]]
         
         try:
             logger.debug("Creating new event with provided details.")
@@ -74,7 +76,7 @@ def addEvent(body):
                 maxParticipants=body["maxparticipants"],
                 registrationFee=body["registrationfee"],
                 ruleBookLink=body.get("rulebooklink"),
-                heads=body["heads"],  
+                heads=heads,  
                 tags=body["tags"],    
                 image=body.get("image"),
                 participationType=body["participationType"],
