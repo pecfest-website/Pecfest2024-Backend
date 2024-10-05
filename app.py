@@ -1,10 +1,12 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from controllers import user, sponser
+from controllers import user
+from controllers import admin, user, sponser
 from util.decorator import general
 from util.exception import PecfestException
 from util.loggerSetup import logger
 from dotenv import load_dotenv
+from util.loggerSetup import logger
 from util.gcb import uploadToGcs
 
 load_dotenv()
@@ -26,6 +28,30 @@ def handle_global_exception(error):
     }), 200
 
 # ---------------------- ADMIN Routes --------------------------
+@app.route('/admin/login', methods=['POST'])
+@general(logReq = True, checkToken=False)
+def login_admin(body, *args, **kwargs):
+    result = admin.login(body)
+    return result, 200
+
+@app.route('/admin/event/list', methods=['POST'])
+@general(logReq=True, checkToken=True)
+def list_admins(*args, **kwargs):
+    admin_id = request.cookies.get('admin_id')
+    result = admin.list_admins(admin_id)
+    return result, 200
+    
+@app.route('/admin/event/add', methods=['POST'])
+@general(logReq = True, checkToken=True)
+def add_event(body, *args, **kwargs):
+    result = admin.add_event(body)
+    return result, 200
+
+@app.route('/admin/event/detail', methods=['POST'])
+@general(logReq = True, checkToken=True)
+def event_detail(body, *args, **kwargs):
+    result = admin.event_detail(body)
+    return result, 200
 
 # ----------------------- EVENT Routes --------------------------
 

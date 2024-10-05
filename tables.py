@@ -1,12 +1,13 @@
 import os
 from dataclasses import dataclass
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text, func, ForeignKey, declarative_base, sessionmaker, relationship, Mapped, Date, Time, Float, Boolean, JSON
+from datetime import datetime
+from sqlalchemy.orm import declarative_base, sessionmaker
 from typing import List
 from datetime import datetime
 from enum import Enum
 from sqlalchemy.sql import func
 from sqlalchemy.sql.sqltypes import Enum as SqlEnum
-from sqlalchemy import create_engine, ForeignKey, Column, Integer, String, Date, Time, Float, Boolean, JSON, DateTime
-from sqlalchemy.orm import declarative_base, sessionmaker, relationship, Mapped
 
 DBUSER=os.getenv("DBUSER")
 DBPASS=os.getenv("DBPASS")
@@ -32,6 +33,12 @@ class User(Base):
 @dataclass
 class Admin(Base):
     __tablename__ = 'admins'
+
+#     id: int = Column(Integer, primary_key=True)
+#     username: str = Column(String, unique=True, nullable=False)
+#     password: str = Column(String, nullable=False)
+#     createdAt = Column(DateTime, default=func.now(), nullable=False)
+#     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
     id: int = Column(Integer, primary_key=True, autoincrement=True)
     username: str = Column(String, unique=True, nullable=False)
     password: str = Column(String, nullable=False)
@@ -39,6 +46,36 @@ class Admin(Base):
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
+@dataclass
+class Event(Base):
+    __tablename__ = 'events'
+    id: int = Column(Integer, primary_key=True)
+    name: str = Column(String, nullable=False)
+    description: str = Column(Text)
+    startdate: datetime = Column(DateTime, nullable=False)
+    starttime: str = Column(String, nullable=False)
+    enddate: datetime = Column(DateTime, nullable=False)
+    endtime: str = Column(String, nullable=False)
+    venue: str = Column(String, nullable=False)
+    eventtype: str = Column(String)
+    minparticipants: int = Column(Integer)
+    maxparticipants: int = Column(Integer)
+    registrationfee: float = Column(String, nullable=False)
+    rulebooklink: str = Column(String)
+    # To handle heads as a list of objects containing headName and 
+    # headPhoneNumber, and tags as a list of tags,
+    # JSON serialization can be used.
+    # Eg: 
+    # tags_list = ["technology", "talk", "seminar"]
+    # new_event.set_tags(tags_list)
+    heads: str = Column(Text, nullable=False)  
+    tags: str = Column(Text, nullable=False)   
+    image: str = Column(String, nullable=True)  # Image URL, can be null
+    participationType: str = Column(String, nullable=False)
+    paymentType: str = Column(String, nullable=False)
+    ruleBookType: str = Column(String, nullable=False)
+    adminId: int = Column(Integer, ForeignKey('admins.id'), nullable=False)  # Foreign key to Admin table
+      
 class EventTypeEnum(Enum):
     CULTURAL = "Cultural"
     TECHNICAL = "Technical"
