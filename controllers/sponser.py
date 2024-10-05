@@ -1,4 +1,5 @@
 from tables import SponserType, Sponser, DBConnectionManager
+from sqlalchemy.orm import joinedload
 from util.exception import PecfestException
 from util.loggerSetup import logger
 from util.gcb import uploadToGcs
@@ -59,3 +60,13 @@ def addSponser(body):
     
     return {"status": "SUCCESS", "statusCode": 200, "message": "Sponsers edited successfully"}
 
+def listSponser():
+    with DBConnectionManager() as session:
+        sponsers = session.query(SponserType).options(joinedload(SponserType.sponsers)).all()
+        return {"status": "SUCCESS", 
+            "statusCode": 200, 
+            "message": "Sponsers Fetched successfully",
+            "data": {
+                "sponsers": sponsers
+            }    
+        }

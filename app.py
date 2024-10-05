@@ -6,6 +6,7 @@ from util.exception import PecfestException
 from util.loggerSetup import logger
 from dotenv import load_dotenv
 from util.gcb import uploadToGcs
+import traceback
 
 load_dotenv()
 app = Flask(__name__)
@@ -16,7 +17,7 @@ def handle_global_exception(error):
     if isinstance(error, PecfestException):
         return jsonify(error.to_dict()), 200
 
-    logger.error(f"Err: Global Error - {error}")
+    logger.error(f"Err: Global Error - {error}\nTraceback: {traceback.format_exc()}")
     
     # For all other exceptions, return a generic message
     return jsonify({
@@ -42,19 +43,24 @@ def addSponser(body, *args, **kwargs):
     result = sponser.addSponser(body)
     return result, 200
 
-# ------------------------ USER Routes ----------------------------
-@app.route('/users/create', methods=['GET'])
-@general(logReq = True, checkToken = True)
-def create_user(body, *args, **kwargs):
-    blob = "hellp"
-    print("hello")
-    try:
-        result = uploadToGcs(blob, "test")
-    except Exception as e:
-        print(e)
+@app.route("/sponser/list", methods=['POST'])
+@general(logReq=True, checkToken=True)
+def listSponser(*args, **kwargs):
+    result = sponser.listSponser()
+    return jsonify(result), 200
 
-    print("hello")
+# ------------------------ USER Routes ----------------------------
+@app.route('/user/create', methods=['POST'])
+@general(logReq = True, checkToken = False)
+def createUser(body, *args, **kwargs):
+    result = user.createUser(body)
     return result, 201
+
+@app.route('/user/login', methods=['POST'])
+@general(logReq = True, checkToken = False)
+def loginUser(body, *args, **kwargs):
+    result = user.loginUser(body)
+    return result, 200
 
 if __name__ == '__main__':
     app.run(debug=True)

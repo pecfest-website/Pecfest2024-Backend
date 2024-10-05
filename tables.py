@@ -1,7 +1,7 @@
 import os
 from dataclasses import dataclass
 from typing import List
-from datetime import datetime
+import datetime
 from enum import Enum
 from sqlalchemy.sql import func
 from sqlalchemy.sql.sqltypes import Enum as SqlEnum
@@ -24,10 +24,19 @@ class User(Base):
     college:str = Column(String, nullable=False)
     sid:str = Column(String)
     email:str = Column(String, nullable=False, unique=True)
+    password:str = Column(String, nullable=False)
     contact:str = Column(String(10), nullable=False, unique=True)
     uuid:str = Column(String, nullable=False, unique=True)
-    createdAt = Column(DateTime, default=func.now(), nullable=False)
-    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    createdAt:datetime = Column(DateTime, default=func.now(), nullable=False)
+    updatedAt:datetime = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "uuid": self.uuid
+        }
 
 @dataclass
 class Admin(Base):
