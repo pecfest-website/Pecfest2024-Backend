@@ -20,7 +20,7 @@ def uploadImage(image,name):
     link = uploadToGcs(image_file, blob_name)
     return link
 
-def multiplePhotos(Session, images, name, typeId):
+def multiplePhotos(session, images, name, typeId):
     if not images:
         return
     for image in images:
