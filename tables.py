@@ -114,7 +114,7 @@ class Event(Base):
     minParticipants: int = Column(Integer)
     maxParticipants: int = Column(Integer)
     paymentType: PaymentTypeEnum = Column(SqlEnum(PaymentTypeEnum), nullable=False)
-    registrationfee: float = Column(Float)
+    registrationFee: float = Column(Float)
     haveRuleBook: bool = Column(Boolean, nullable=False)
     rulebooklink: str = Column(String)
     tags: list = Column(JSON)
