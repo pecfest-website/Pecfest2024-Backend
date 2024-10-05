@@ -51,6 +51,12 @@ def eventDetail(body, *args, **kwargs):
     result = admin.eventDetail(body)
     return result, 200
 
+@app.route('/admin/tag/list', methods=['POST'])
+@general(logReq=True, checkToken=True)
+def listTag(body, *args, **kwargs):
+    result = admin.listTag()
+    return jsonify(result), 200
+    
 # ----------------------- EVENT Routes --------------------------
 @app.route('/event/list', methods=['POST'])
 @general(logReq=True, checkToken=True)

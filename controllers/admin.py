@@ -1,4 +1,4 @@
-from tables import DBConnectionManager, Admin, Event, User
+from tables import DBConnectionManager, Admin, Event, User, Tag
 from util.exception import PecfestException
 from util.loggerSetup import logger
 from flask import make_response, jsonify
@@ -142,3 +142,15 @@ def eventDetail(body):
         except Exception as e:
             logger.error(f"Err occurred in event_detail: {e}")
             raise PecfestException(statusCode=500, message="Internal server error")
+
+def listTag():
+    with DBConnectionManager() as session:
+        tags = session.query(Tag).all()
+        return {
+            "status": "SUCCESS",
+            "statusCode": 200,
+            "message": "Tags fetched successfully",
+            "data": {
+                "tags": tags
+            }
+        }
