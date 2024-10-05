@@ -116,7 +116,7 @@ class Event(Base):
     paymentType: PaymentTypeEnum = Column(SqlEnum(PaymentTypeEnum), nullable=False)
     registrationFee: float = Column(Float)
     haveRuleBook: bool = Column(Boolean, nullable=False)
-    rulebooklink: str = Column(String)
+    ruleBookLink: str = Column(String)
     tags: list = Column(JSON)
     image: str = Column(String, nullable=True)
     createdAt = Column(DateTime, default=func.now(), nullable=False)
