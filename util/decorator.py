@@ -26,6 +26,7 @@ def general(logReq=False, checkToken=False):
                     logger.error("Token validation failed")
                     raise PecfestException(statusCode=401, message="Session expired, login again!")
 
+
             # Call the original function depending on the request method
             if request.method == 'GET':
                 # For GET requests, we don't pass the body
@@ -33,8 +34,9 @@ def general(logReq=False, checkToken=False):
             else:
                 # For POST, PUT, etc. requests, pass the JSON body
                 body = request.json
-                return func(body, *args, **kwargs)
-        
+                
+            output = func(body, *args, **kwargs)
+            return output
         wrapper.__name__ = func.__name__
         return wrapper
     return decorator
