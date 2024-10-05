@@ -39,7 +39,7 @@ def login(body):
 def listEvents(body):
     body = {
         "filters": {
-            "adminId": body.get('reqUser').get("id") if body.get("requser") else None
+            "adminId": body.get('reqUser').get("id") if body.get("reqUser") else None
         }
     }
     print(body)
