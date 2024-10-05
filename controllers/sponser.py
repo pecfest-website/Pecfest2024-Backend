@@ -3,13 +3,28 @@ from sqlalchemy.orm import joinedload
 from util.exception import PecfestException
 from util.loggerSetup import logger
 from util.gcb import uploadToGcs
+import base64
+from io import BytesIO
+
+def uploadImage(image,name):
+    if image.startswith('data:image/'):
+        header, base64_image = base64_image.split(';base64,')  # Get only the base64 part
+
+    image_data = base64.b64decode(base64_image)
+    image_file = BytesIO(image_data)
+
+    # Optionally, set the filename or the blob name
+    blob_name = "sponser/{name}/uploaded_image.jpg"  # Customize this as needed
+
+    # Upload to Google Cloud Storage
+    link = uploadToGcs(image_file, blob_name)
+    return link
 
 def multiplePhotos(Session, images, name, typeId):
     if not images:
         return
     for image in images:
-        print(image.filename)
-        link = uploadToGcs(image,"/sponser/{name}/{image.filename}")
+        link = uploadImage(image,name)
         sponser = Sponser(link= link,typeId=typeId)
         session.add(sponser)
 

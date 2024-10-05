@@ -6,7 +6,7 @@ def uploadToGcs(file, destinationBlobName):
     bucket = storageClient.bucket("pecfest")
     blob = bucket.blob(f"website2024/{destinationBlobName}")
 
-    # blob.upload_from_file(file)
-    blob.upload_from_filename("namit.jpg")
+    blob.upload_from_file(file, content_type='image/jpeg')
+    # blob.upload_from_filename("namit.jpg")
     blob.make_public()
     return blob.public_url
