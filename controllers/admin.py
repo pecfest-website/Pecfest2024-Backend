@@ -60,7 +60,7 @@ def addEvent(body):
                 logger.debug(f"Missing required field: {field}")
                 raise PecfestException(statusCode=301, message=f"Please provide {field}")
 
-        link = uploadImage(body['image'], body['type'], "event")
+        link = uploadImage(body['image'], body['eventtype'], "event")
         heads = [Head(name=head["name"], phoneNumber=head["contact"]) for head in body["heads"]]
         
         try:
