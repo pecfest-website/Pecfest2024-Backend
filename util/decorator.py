@@ -22,5 +22,6 @@ def general(logReq = False, checkToken = False):
 
             output = func(body, *args, **kwargs)
             return output
+        wrapper.__name__ = func.__name__
         return wrapper
     return decorator
