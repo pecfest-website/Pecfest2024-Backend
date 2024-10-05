@@ -78,7 +78,7 @@ def addEvent(body):
                 tags=body["tags"],    
                 image=body.get("image"),
                 participationType=body["participationType"],
-                paymentType=body["paymentTime"],
+                paymentType=body["paymentType"],
                 ruleBookType=body["ruleBookType"],
                 adminId=body["adminId"]
             )
