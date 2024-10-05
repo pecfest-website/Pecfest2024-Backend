@@ -56,7 +56,7 @@ def eventDetail(body, *args, **kwargs):
 def listTag(body, *args, **kwargs):
     result = admin.listTag()
     return jsonify(result), 200
-    
+
 # ----------------------- EVENT Routes --------------------------
 @app.route('/event/list', methods=['POST'])
 @general(logReq=True, checkToken=True)

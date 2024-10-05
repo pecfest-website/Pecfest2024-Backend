@@ -3,6 +3,7 @@ from util.exception import PecfestException
 from util.loggerSetup import logger
 from flask import make_response, jsonify
 from controllers.user import generateToken
+from controllers.event import listEvent
 import redis
 import json
 
@@ -36,44 +37,13 @@ def login(body):
         }
 
 def listEvents(body):
-    admin_id = body.get("admin_id")
-    with DBConnectionManager() as session:
-        try:
-            logger.debug("Opening DB session")
-            logger.debug("Querying all events created by the admin from the database.")
-            events = session.query(Event).filter(Event.adminId == admin_id).all()
-            logger.debug(f"Number of events retrieved: {len(events)}")
-            
-            event_list = []
-            for event in events:
-                logger.debug(f"Processing event: {event.name}")
-                event_list.append({
-                    "name": event.name,
-                    "description": event.description,
-                    "startdate": event.startdate.strftime("%Y-%m-%d") if event.startdate else None,
-                    "starttime": event.starttime,
-                    "enddate": event.enddate.strftime("%Y-%m-%d") if event.enddate else None,
-                    "endtime": event.endtime,
-                    "venue": event.venue,
-                    "eventtype": event.eventtype,
-                    "minparticipants": event.minparticipants,
-                    "maxparticipants": event.maxparticipants,
-                    "registrationfee": event.registrationfee,
-                    "rulebooklink": event.rulebooklink,
-                    "tags": event.tags,
-                    "image": event.image,
-                    "participationType": event.participationType,
-                    "paymentType": event.paymentType,
-                    "ruleBookType": event.ruleBookType,
-                    "created_at": event.createdAt.strftime("%Y-%m-%d %H:%M:%S") if event.createdAt else None,
-                    "updated_at": event.updatedAt.strftime("%Y-%m-%d %H:%M:%S") if event.updatedAt else None,
-                })
-            
-            logger.debug(f"Event list created: {event_list}")
-            return {"status": "SUCCESS", "responseCode": 200, "message": "Events retrieved successfully", "data": event_list}
-        except Exception as e:
-            logger.error(f"Error occurred in list_admins: {e}")
-            raise PecfestException(statusCode=401, message="Invalid credentials")
+    body = {
+        "filters": {
+            "adminId": body.get('reqUser').get("id") if body.get("requser") else None
+        }
+    }
+    print(body)
+    return listEvent(body)
 
 def addEvent(body):
     with DBConnectionManager() as session:

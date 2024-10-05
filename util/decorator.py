@@ -1,19 +1,28 @@
 from flask import request
 from util.loggerSetup import logger
 from util.exception import PecfestException
+import redis
+
+redisClient = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
 
 def tokenChecker(token):
-    return True
+    try:
+        token = token.split(" ")[1]
+        user = redisClient.get(token)
+        return user
+    except Exception as e:
+        logger.error(f"invalid token , {e}")
+        raise PecfestException(statusCode=403, message="Invalid token provided")
 
 def general(logReq=False, checkToken=False):
     def decorator(func):
         def wrapper(*args, **kwargs):
             headers = request.headers
-            
+            user = None
             # Log request details
             if logReq:
                 headers_str = ', '.join(f"{key}: {value}" for key, value in headers.items())
-                body = request.json if request.method != 'GET' else None
+                body = request.get_json() if request.method != 'GET' else None
                 logger.info(f"Request: {request.method} {request.url} | Headers: {headers_str} | Body: {body}")
 
             # Check token if required
@@ -22,7 +31,9 @@ def general(logReq=False, checkToken=False):
                 if not token:
                     logger.error("Token missing in request")
                     raise PecfestException(statusCode=404, message="Please provide token")
-                if not tokenChecker(token):
+                
+                user = tokenChecker(token)
+                if not user:
                     logger.error("Token validation failed")
                     raise PecfestException(statusCode=401, message="Session expired, login again!")
 
@@ -34,7 +45,7 @@ def general(logReq=False, checkToken=False):
             else:
                 # For POST, PUT, etc. requests, pass the JSON body
                 body = request.json
-                
+                body['reqUser'] = user if user else None
             output = func(body, *args, **kwargs)
             return output
         wrapper.__name__ = func.__name__
