@@ -8,9 +8,9 @@ from io import BytesIO
 
 def uploadImage(image,name):
     if image.startswith('data:image/'):
-        header, base64_image = base64_image.split(';base64,')  # Get only the base64 part
+        header, image = image.split(';base64,')  # Get only the base64 part
 
-    image_data = base64.b64decode(base64_image)
+    image_data = base64.b64decode(image)
     image_file = BytesIO(image_data)
 
     # Optionally, set the filename or the blob name
