@@ -46,6 +46,7 @@ def listEvents(body):
     return listEvent(body)
 
 def addEvent(body):
+    body['adminId'] = body.get("reqUser").get("id") if body.get("reqUser") else None
     with DBConnectionManager() as session:
         required_fields = [
             'name', 'description', 'startdate', 'starttime', 'enddate', 'endtime',
