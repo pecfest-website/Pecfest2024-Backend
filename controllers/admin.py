@@ -3,7 +3,7 @@ from util.exception import PecfestException
 from util.loggerSetup import logger
 from flask import make_response, jsonify
 from controllers.user import generateToken
-from controllers.event import listEvent
+from controllers.event import listEvent, eventDetails
 from util.gcb import uploadImage
 import redis
 import json
@@ -94,29 +94,11 @@ def addEvent(body):
         except Exception as e:
             logger.error(f"Error occurred in add_event: {e}")
             raise PecfestException(statusCode=500, message="Internal server error")
-        
+
 def eventDetail(body):
-    with DBConnectionManager() as session:
-        try:
-            query = session.query(Event)
-            
-            if 'event_id' in body:
-                query = query.filter(Event.id == body['event_id'])
-            if 'event_name' in body:
-                query = query.filter(Event.name == body['event_name'])
-            
-            students = query.all()
-            student_list = [
-                {
-                    "name": student.name,
-                    "contact_number": student.contact_number,
-                    "email": student.email
-                } for student in students
-            ]
-            return {"status": "SUCCESS", "responseCode": 200, "message": "Students retrieved successfully", "data": student_list}
-        except Exception as e:
-            logger.error(f"Err occurred in event_detail: {e}")
-            raise PecfestException(statusCode=500, message="Internal server error")
+    body['adminId'] = body.get("reqUser").get("id") if body.get("reqUser") else None
+    
+    return eventDetails(body)
 
 def listTag():
     with DBConnectionManager() as session:
