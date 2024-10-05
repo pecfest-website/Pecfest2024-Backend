@@ -83,6 +83,12 @@ def listSponser(*args, **kwargs):
     result = sponser.listSponser()
     return jsonify(result), 200
 
+@app.route("/admin/sponser/delete", methods=['POST'])
+@general(logReq=True, checkToken=True)
+def deleteType(body, *args, **kwargs):
+    result = sponser.deleteType(body)
+    return result, 200
+
 # ------------------------ USER Routes ----------------------------
 @app.route('/user/create', methods=['POST'])
 @general(logReq = True, checkToken = False)

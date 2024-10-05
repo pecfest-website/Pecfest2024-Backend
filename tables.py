@@ -32,7 +32,7 @@ class User(Base):
     
     def to_dict(self):
         return {
-            "id": self.id,
+            "userId": self.id,
             "name": self.name,
             "email": self.email,
             "uuid": self.uuid
@@ -170,6 +170,7 @@ class SponserType(Base):
     id: int = Column(Integer, primary_key=True, autoincrement=True)
     name: str = Column(String, nullable = False)
     priorty: int = Column(Integer, nullable = False, default=1)
+    isDeleted: bool = Column(Boolean, nullable=False, default=False)
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
     sponsers: Mapped[List[Sponser]] = relationship("Sponser", back_populates="sponserType")

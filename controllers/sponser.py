@@ -59,9 +59,29 @@ def addSponser(body):
     
     return {"status": "SUCCESS", "statusCode": 200, "message": "Sponsers edited successfully"}
 
+def deleteType(body):
+    typeId = body.get("typeId")
+    if not typeId:
+        raise PecfestException(statusCode=301, message="Please provide category type id")
+
+    with DBConnectionManager() as session:
+        spTy = session.query(SponserType).filter(SponserType.id == typeId).first()
+
+        if not spTy:
+            raise PecfestException(statusCode=404, message="No such type exists")
+
+        spTy.isDeleted = True
+        session.commit()
+
+    return {
+        "status": "SUCCESS",
+        "statusCode": 200,
+        "message": "Sponser Type removed successfully"
+    }
+
 def listSponser():
     with DBConnectionManager() as session:
-        sponsers = session.query(SponserType).options(joinedload(SponserType.sponsers)).all()
+        sponsers = session.query(SponserType).filter(SponserType.isDeleted == False).options(joinedload(SponserType.sponsers)).all()
         return {"status": "SUCCESS", 
             "statusCode": 200, 
             "message": "Sponsers Fetched successfully",
