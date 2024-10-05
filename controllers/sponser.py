@@ -3,8 +3,6 @@ from sqlalchemy.orm import joinedload
 from util.exception import PecfestException
 from util.loggerSetup import logger
 from util.gcb import uploadImage
-import base64
-from io import BytesIO
 
 def multiplePhotos(session, images, name, typeId):
     if not images:

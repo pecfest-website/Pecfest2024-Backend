@@ -1,5 +1,7 @@
 import os
 from google.cloud import storage
+import base64
+from io import BytesIO
 
 def uploadImage(image,name,type='sponser'):
     if image.startswith('data:image/'):
