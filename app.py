@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from controllers import user, sponser
+from controllers import admin, sponser, user, event
 from util.decorator import general
 from util.exception import PecfestException
 from util.loggerSetup import logger
@@ -27,8 +27,36 @@ def handle_global_exception(error):
     }), 200
 
 # ---------------------- ADMIN Routes --------------------------
+@app.route('/admin/login', methods=['POST'])
+@general(logReq = True, checkToken=False)
+def loginAdmin(body, *args, **kwargs):
+    result = admin.login(body)
+    return result, 200
+
+@app.route('/admin/event/list', methods=['POST'])
+@general(logReq=True, checkToken=True)
+def listAdminEvents(body, *args, **kwargs):
+    result = admin.listEvents(body)
+    return result, 200
+    
+@app.route('/admin/event/add', methods=['POST'])
+@general(logReq = True, checkToken=True)
+def addEvent(body, *args, **kwargs):
+    result = admin.addEvent(body)
+    return result, 200
+
+@app.route('/admin/event/detail', methods=['POST'])
+@general(logReq = True, checkToken=True)
+def eventDetail(body, *args, **kwargs):
+    result = admin.eventDetail(body)
+    return result, 200
 
 # ----------------------- EVENT Routes --------------------------
+@app.route('/event/list', methods=['POST'])
+@general(logReq=True, checkToken=True)
+def listEvents(body, *args, **kwargs):
+    result = event.listEvent(body)
+    return jsonify(result), 200
 
 # ---------------------- Sponsper Routes ------------------------
 @app.route('/admin/sponserType/create', methods=['POST'])

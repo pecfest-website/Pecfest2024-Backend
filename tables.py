@@ -1,12 +1,12 @@
 import os
 from dataclasses import dataclass
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text, func, ForeignKey, Date, Time, Float, Boolean, JSON
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship, Mapped
 from typing import List
 import datetime
 from enum import Enum
 from sqlalchemy.sql import func
 from sqlalchemy.sql.sqltypes import Enum as SqlEnum
-from sqlalchemy import create_engine, ForeignKey, Column, Integer, String, Date, Time, Float, Boolean, JSON, DateTime
-from sqlalchemy.orm import declarative_base, sessionmaker, relationship, Mapped
 
 DBUSER=os.getenv("DBUSER")
 DBPASS=os.getenv("DBPASS")
@@ -47,6 +47,13 @@ class Admin(Base):
     domain: str = Column(String, nullable=False)
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "domain": self.domain
+        }
 
 class EventTypeEnum(Enum):
     CULTURAL = "Cultural"
@@ -94,6 +101,7 @@ class Participant(Base):
 class Event(Base):
     __tablename__ = 'events'
     id: int = Column(Integer, primary_key=True, autoincrement=True)
+    adminId: int = Column(Integer, ForeignKey("admins.id"), nullable=False)
     name: str = Column(String, nullable=False)
     description: str = Column(String, nullable=False)
     startDate: datetime = Column(Date, nullable=False)
