@@ -24,7 +24,7 @@ def addType(body):
             session.add(sponserType)
             session.commit()
 
-            images = body.get("photos")
+            images = body.get("images")
             if images:
                 multiplePhotos(session, images, name, sponserType.id)
             session.commit()
