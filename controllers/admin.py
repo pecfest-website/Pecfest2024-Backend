@@ -1,4 +1,4 @@
-from tables import DBConnectionManager, Admin, Event, User, Tag
+from tables import DBConnectionManager, Admin, Event, User, Tag, Head
 from util.exception import PecfestException
 from util.loggerSetup import logger
 from flask import make_response, jsonify
