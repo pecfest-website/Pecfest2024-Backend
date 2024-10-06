@@ -63,6 +63,8 @@ def addEvent(body):
         link = uploadImage(body['image'], body['eventtype'], "event")
         heads = [Head(name=head["name"], phoneNumber=head["contact"]) for head in body["heads"]]
         
+        if (body["ruleBookType"] == 'true' and not body.get("rulebooklink")):
+            raise PecfestException(statusCode=301, message="Please provide rule book link")
         try:
             logger.debug("Creating new event with provided details.")
             new_event = Event(
