@@ -52,7 +52,7 @@ def addEvent(body):
         required_fields = [
             'name', 'description', 'startdate', 'starttime', 'enddate', 'endtime',
             'venue', 'eventtype', 'minparticipants', 'maxparticipants', 'registrationfee',
-            'heads', 'tags', 'participationType', 'paymentType', 'ruleBookType', 'adminId', 'image', 'provideAccommodation'
+            'heads', 'tags', 'participationType', 'paymentType', 'ruleBookType', 'adminId', 'image'
         ]
         
         for field in required_fields:
