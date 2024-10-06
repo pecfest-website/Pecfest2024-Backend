@@ -52,7 +52,7 @@ def addEvent(body):
         required_fields = [
             'name', 'description', 'startdate', 'starttime', 'enddate', 'endtime',
             'venue', 'eventtype', 'minparticipants', 'maxparticipants', 'registrationfee',
-            'heads', 'tags', 'participationType', 'paymentType', 'ruleBookType', 'adminId', 'image'
+            'heads', 'tags', 'participationType', 'paymentType', 'ruleBookType', 'adminId', 'image', 'provideAccommodation'
         ]
         
         for field in required_fields:
@@ -84,13 +84,14 @@ def addEvent(body):
                 paymentType=body["paymentType"],
                 haveRuleBook=body["ruleBookType"] == 'true',
                 adminId=body["adminId"],
-                image=link
+                image=link,
+                provideAccommodation=body['provideAccommodation']
             )
             logger.debug(f"New event created: {new_event}")
             session.add(new_event)
             session.commit()
             logger.debug("Event added to the database successfully.")
-            return {"status": "SUCCESS", "responseCode": 200, "message": "Event added successfully"}
+            return {"status": "SUCCESS", "statusCode": 200, "message": "Event added successfully"}
         except Exception as e:
             logger.error(f"Error occurred in add_event: {e}")
             raise PecfestException(statusCode=500, message="Internal server error")
