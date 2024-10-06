@@ -117,6 +117,7 @@ class Event(Base):
     registrationFee: float = Column(Float)
     haveRuleBook: bool = Column(Boolean, nullable=False)
     ruleBookLink: str = Column(String)
+    provideAccommodation: bool = Column(Boolean, default=False, nullable=False)
     tags: list = Column(JSON)
     image: str = Column(String, nullable=True)
     createdAt = Column(DateTime, default=func.now(), nullable=False)
