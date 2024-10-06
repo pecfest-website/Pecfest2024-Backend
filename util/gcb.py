@@ -2,6 +2,7 @@ import os
 from google.cloud import storage
 import base64
 from io import BytesIO
+import time
 
 def uploadImage(image,name,type='sponser'):
     if image.startswith('data:image/'):
@@ -9,7 +10,7 @@ def uploadImage(image,name,type='sponser'):
     image_data = base64.b64decode(image)
     image_file = BytesIO(image_data)
 
-    blob_name = f"{type}/{name}/uploaded_image.jpg"
+    blob_name = f"{type}/{name}/{time.time()}.jpg"
     link = uploadToGcs(image_file, blob_name)
     return link
 
