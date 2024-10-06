@@ -10,11 +10,12 @@ def tokenChecker(token):
     try:
         token = token.split(" ")[1]
         user = redisClient.get(token)
-
-        return json.loads(user)
+    
     except Exception as e:
         logger.error(f"invalid token , {e}")
         raise PecfestException(statusCode=403, message="Invalid token provided")
+
+    return user
 
 def general(logReq=False, checkToken=False):
     def decorator(func):
@@ -47,7 +48,7 @@ def general(logReq=False, checkToken=False):
             else:
                 # For POST, PUT, etc. requests, pass the JSON body
                 body = request.json
-                body['reqUser'] = user if user else None
+                body['reqUser'] = json.loads(user) if user else None
             output = func(body, *args, **kwargs)
             return output
         wrapper.__name__ = func.__name__
