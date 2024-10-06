@@ -1,7 +1,7 @@
 import os
 from dataclasses import dataclass
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text, func, ForeignKey, Date, Time, Float, Boolean, JSON
-from sqlalchemy.orm import declarative_base, sessionmaker, relationship, Mapped
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship, Mapped, backref
 from typing import List
 import datetime
 from enum import Enum
@@ -24,11 +24,13 @@ class User(Base):
     college:str = Column(String, nullable=False)
     sid:str = Column(String)
     email:str = Column(String, nullable=False, unique=True)
-    password:str = Column(String, nullable=False)
+    password = Column(String, nullable=False)
     contact:str = Column(String(10), nullable=False, unique=True)
     uuid:str = Column(String, nullable=False, unique=True)
-    createdAt:datetime = Column(DateTime, default=func.now(), nullable=False)
-    updatedAt:datetime = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    createdAt = Column(DateTime, default=func.now(), nullable=False)
+    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+
+    teamMem = relationship("TeamMember", back_populates='user')
     
     def to_dict(self):
         return {
@@ -90,8 +92,12 @@ class Participant(Base):
     id: int = Column(Integer, primary_key=True, autoincrement=True)
 
     #It will contain userId in case of participationType = Single else it will contain team id.
-    participantId: int = Column(Integer, nullable=False)
+    participantId: str = Column(String, nullable=False)
     eventId: int = Column(Integer, ForeignKey('events.id'), nullable=False)
+    requireAccomodations: bool = Column(Boolean, nullable=False, default=False)
+    paymentId: str = Column(String)
+    paymentProof: str = Column(String)
+    billingAddress: str = Column(String)
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
@@ -135,12 +141,13 @@ class MemberTypeEnum(Enum):
 class TeamMember(Base):
     __tablename__ = "teamMembers"
     id: int = Column(Integer, primary_key=True, autoincrement=True)
-    userId: int = Column(Integer, ForeignKey("users.id"), nullable=False)
+    userId: str = Column(String, ForeignKey("users.uuid"), nullable=False)
     memberType: MemberTypeEnum = Column(SqlEnum(MemberTypeEnum), nullable=False)
     teamId: int = Column(Integer, ForeignKey("teams.id"), nullable = False)
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
+    user:Mapped[List[User]] = relationship("User", back_populates="teamMem")
     team = relationship("Team", back_populates="members")
 
 @dataclass
@@ -148,6 +155,7 @@ class Team(Base):
     __tablename__ = "teams"
     id: int = Column(Integer, primary_key=True, autoincrement=True)
     teamName: str = Column(String, nullable=False)
+    teamSize: int = Column(Integer, nullable=False)
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
     members: Mapped[List[TeamMember]] = relationship("TeamMember", back_populates="team")

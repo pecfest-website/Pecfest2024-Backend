@@ -34,7 +34,7 @@ def login(body):
             "status": "SUCCESS",
             "statusCode": 200,
             "message": "Admin logged in successfully",
-            "data": {"token": token}
+            "data": {"token": token, "type": admin.domain}
         }
 
 def listEvents(body):

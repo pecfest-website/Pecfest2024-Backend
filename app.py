@@ -64,6 +64,12 @@ def listEvents(body, *args, **kwargs):
     result = event.listEvent(body)
     return jsonify(result), 200
 
+@app.route('/event/register', methods=['POST'])
+@general(logReq=True, checkToken=True)
+def regEvent(body, *args, **kwargs):
+    result = event.register(body)
+    return jsonify(result), 200
+
 # ---------------------- Sponsper Routes ------------------------
 @app.route('/admin/sponserType/create', methods=['POST'])
 @general(logReq=True, checkToken=True)
