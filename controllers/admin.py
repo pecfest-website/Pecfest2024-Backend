@@ -3,7 +3,7 @@ from util.exception import PecfestException
 from util.loggerSetup import logger
 from flask import make_response, jsonify
 from controllers.user import generateToken
-from controllers.event import listEvent, eventDetails
+from controllers.event import listEvent, adminEventDetails
 from util.gcb import uploadImage
 import redis
 import json
@@ -100,7 +100,7 @@ def addEvent(body):
 def eventDetail(body):
     body['adminId'] = body.get("reqUser").get("id") if body.get("reqUser") else None
     
-    return eventDetails(body)
+    return adminEventDetails(body)
 
 def listTag():
     with DBConnectionManager() as session:

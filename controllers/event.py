@@ -1,8 +1,18 @@
 from tables import Event, DBConnectionManager, Team, User, ParticipationTypeEnum, PaymentTypeEnum, Participant, Team, TeamMember, MemberTypeEnum, Tag
-from sqlalchemy.orm import joinedload, noload
+from sqlalchemy.orm import joinedload, noload, with_loader_criteria
 from util.exception import PecfestException
 from flask import jsonify
 from util.gcb import uploadImage
+
+def formatEvent(event, tags):
+    event.startDate = event.startDate.strftime("%Y-%m-%d") if event.startDate else None
+    event.startTime = event.startTime.strftime("%H:%M") if event.startTime else None
+    event.endDate = event.endDate.strftime("%Y-%m-%d") if event.endDate else None
+    event.endTime = event.endTime.strftime("%H:%M") if event.endTime else None
+    event.eventType = event.eventType.name
+    event.participationType = event.participationType.name
+    event.paymentType = event.paymentType.name
+    event.tags = [tags.get(int(tag)) for tag in event.tags]
 
 def listEvent(body):
     filters = body.get("filters")
@@ -20,14 +30,7 @@ def listEvent(body):
         tags = {int(tag.id): tag.name for tag in tags}
 
         for event in events:
-            event.startDate = event.startDate.strftime("%Y-%m-%d") if event.startDate else None
-            event.startTime = event.startTime.strftime("%H:%M:%S") if event.startTime else None
-            event.endDate = event.endDate.strftime("%Y-%m-%d") if event.endDate else None
-            event.endTime = event.endTime.strftime("%H:%M:%S") if event.endTime else None
-            event.eventType = event.eventType.name
-            event.participationType = event.participationType.name
-            event.paymentType = event.paymentType.name
-            event.tagNames = [tags.get(int(tag)) for tag in event.tags]
+            formatEvent(event, tags)
             
         return {
             "statusCode": 200,
@@ -38,7 +41,39 @@ def listEvent(body):
             }
         }
 
-def eventDetails(body):
+
+def getParticipants(session, event):
+    participantIds = []
+    idToPart = {}
+    for participant in event.participants:
+        participantIds.append(participant.participantId)
+        idToPart[int(participant.participantId)] = participant
+
+    participants = []
+
+    if event.participationType == ParticipationTypeEnum.TEAM.name:
+        teams = session.query(Team).options(joinedload(Team.members).joinedload(TeamMember.user), with_loader_criteria(TeamMember, TeamMember.memberType == MemberTypeEnum.ACCEPTED)).filter(Team.id.in_(participantIds)).all()
+        for part in teams: 
+            for mem in part.members:
+                mem.memberType = mem.memberType.name
+            participant = idToPart[part.id]
+            tmp = jsonify(part).json
+            tmp['requireAccomodations'] = participant.requireAccomodations
+            tmp['paymentId'] = participant.paymentId
+            participants.append(tmp)
+
+    else:
+        users = session.query(User).filter(User.uuid.in_(participantIds)).all()
+        for user in users:
+            participant = idToPart[user.id]
+            tmp = jsonify(user).json
+            tmp['requireAccomodations'] = participant.requireAccomodations
+            tmp['paymentId'] = participant.paymentId
+            participants.append(tmp)
+    
+    return participants
+
+def adminEventDetails(body):
     eventId = body.get("eventId")
     if not eventId:
         raise PecfestException(statusCode=301, message="Please provide event id")
@@ -53,35 +88,13 @@ def eventDetails(body):
         event = session.query(Event).filter(Event.id == eventId, *filters).options(joinedload(Event.participants), joinedload(Event.heads)).first()
         if not event:
             raise PecfestException(statusCode=404, message="No event exists")
+        
+        tags = session.query(Tag).all()
+        tags = {int(tag.id): tag.name for tag in tags}
 
-        event.startDate = event.startDate.strftime("%Y-%m-%d") if event.startDate else None
-        event.startTime = event.startTime.strftime("%H:%M:%S") if event.startTime else None
-        event.endDate = event.endDate.strftime("%Y-%m-%d") if event.endDate else None
-        event.endTime = event.endTime.strftime("%H:%M:%S") if event.endTime else None
-        event.eventType = event.eventType.name
-        event.participationType = event.participationType.name
-        event.paymentType = event.paymentType.name
+        formatEvent(event, tags)
+        participants = getParticipants(session, event)
 
-        participantIds = []
-        idToPart = {}
-        for participant in event.participants:
-            participantIds.append(participant.participantId)
-            idToPart[participant.participantId] = participant
-
-        participants = []
-        if event.participationType == "TEAM":
-            participants = session.query(Team).options(joinedload(Team.members).joinedload(TeamMember.user)).filter(Team.id.in_(participantIds)).all()
-
-            for part in participants:
-                for mem in part.members:
-                    mem.memberType = mem.memberType.name
-                part.participant = idToPart[part.id]
-
-        else:
-            participants = session.query(User).filter(User.uuid.in_(participantIds)).all()
-            for user in participants:
-                user.participant = idToPart[user.id]
-    
         event = jsonify(event).json
         event['participants'] = participants
 
@@ -94,7 +107,49 @@ def eventDetails(body):
             }
         }
 
+def eventDetail(body):
+    eventId = body.get("eventId")
+    if not eventId:
+        raise PecfestException(statusCode=301, message="Please provide event id")
 
+    with DBConnectionManager() as session:
+        event = session.query(Event).filter(Event.id == eventId).options(joinedload(Event.heads), noload("*")).first()
+
+        if not event:
+            raise PecfestException(statusCode=404, message="No such event exists")
+
+        tags = session.query(Tag).all()
+        tags = {int(tag.id): tag.name for tag in tags}
+
+        formatEvent(event, tags)
+
+        event = jsonify(event).json
+        event['participated'] = False
+
+        if body.get("reqUser") and body.get("reqUser").get("userId"):
+            userId = body.get("reqUser").get("userId")
+            participants = session.query(Participant.participantId).filter(Participant.eventId == eventId).all()
+            if Event.eventType == EventTypeEnum.Team.name:
+                teams = session.query(Team).filter(Team.id.in_(participants)).all()
+                joined = session.query(TeamMember).filter(TeamMember.teamId.in_(teams), TeamMember.memberType == MemberTypeEnum.ACCEPTED, TeamMember.userId == userId).first()
+                if joined:
+                    event['participated'] = True
+            else:
+                if userId in participants:
+                    event['participated'] = True
+
+        return {
+            status: "SUCCESS",
+            statusCode: 200,
+            message: "Details fetched successfully",
+            data: event
+        }
+
+
+
+
+
+        
 
         
 def register(body):

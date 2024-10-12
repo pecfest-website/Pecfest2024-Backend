@@ -17,7 +17,7 @@ def tokenChecker(token):
 
     return user
 
-def general(logReq=False, checkToken=False):
+def general(logReq=False, checkToken=False, tryUser = False):
     def decorator(func):
         def wrapper(*args, **kwargs):
             headers = request.headers
@@ -29,8 +29,8 @@ def general(logReq=False, checkToken=False):
                 logger.info(f"Request: {request.method} {request.url} | Headers: {headers_str} | Body: {body}")
 
             # Check token if required
+            token = headers.get("token")
             if checkToken:
-                token = headers.get("token")
                 if not token:
                     logger.error("Token missing in request")
                     raise PecfestException(statusCode=404, message="Please provide token")
@@ -38,8 +38,10 @@ def general(logReq=False, checkToken=False):
                 user = tokenChecker(token)
                 if not user:
                     logger.error("Token validation failed")
-                    raise PecfestException(statusCode=401, message="Session expired, login again!")
+                    raise PecfestException(statusCode=501, message="Session expired, login again!")
 
+            if not checkToken and tryUser:
+                user = tokenChecker(token)
 
             # Call the original function depending on the request method
             if request.method == 'GET':
