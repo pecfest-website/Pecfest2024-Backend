@@ -52,14 +52,14 @@ def eventDetail(body, *args, **kwargs):
     return result, 200
 
 @app.route('/admin/tag/list', methods=['POST'])
-@general(logReq=True, checkToken=True)
+@general(logReq=True, checkToken=False)
 def listTag(body, *args, **kwargs):
     result = admin.listTag()
     return jsonify(result), 200
 
 # ----------------------- EVENT Routes --------------------------
 @app.route('/event/list', methods=['POST'])
-@general(logReq=True, checkToken=True)
+@general(logReq=True, checkToken=False)
 def listEvents(body, *args, **kwargs):
     result = event.listEvent(body)
     return jsonify(result), 200
@@ -84,7 +84,7 @@ def addSponser(body, *args, **kwargs):
     return result, 200
 
 @app.route("/sponser/list", methods=['POST'])
-@general(logReq=True, checkToken=True)
+@general(logReq=True, checkToken=False)
 def listSponser(*args, **kwargs):
     result = sponser.listSponser()
     return jsonify(result), 200

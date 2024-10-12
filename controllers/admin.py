@@ -43,7 +43,6 @@ def listEvents(body):
             "adminId": body.get('reqUser').get("id") if body.get("reqUser") else None
         }
     }
-    print(body)
     return listEvent(body)
 
 def addEvent(body):

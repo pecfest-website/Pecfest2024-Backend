@@ -7,6 +7,7 @@ import datetime
 from enum import Enum
 from sqlalchemy.sql import func
 from sqlalchemy.sql.sqltypes import Enum as SqlEnum
+from util.loggerSetup import logger
 
 DBUSER=os.getenv("DBUSER")
 DBPASS=os.getenv("DBPASS")
@@ -194,6 +195,6 @@ class DBConnectionManager:
     def __exit__(self, exc_type, exc_value, traceback):
         self.session.close()
         if exc_type or exc_value or traceback:
-            self.session.rollback()  # Rollback in case of exception
-            print(f"An error occurred: {exc_value}")
+            self.session.rollback()
+            logger.error(f"An error occurred: {exc_value}")
         return False
