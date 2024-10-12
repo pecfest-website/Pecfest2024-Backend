@@ -62,7 +62,11 @@ def eventDetails(body):
         event.participationType = event.participationType.name
         event.paymentType = event.paymentType.name
 
-        participantIds = [participant.participantId for participant in event.participants]
+        participantIds = []
+        idToPart = {}
+        for participant in event.participants:
+            participantIds.append(participant.participantId)
+            idToPart[participant.participantId] = participant
 
         participants = []
         if event.participationType == "TEAM":
@@ -71,9 +75,12 @@ def eventDetails(body):
             for part in participants:
                 for mem in part.members:
                     mem.memberType = mem.memberType.name
+                part.participant = idToPart[part.id]
 
         else:
             participants = session.query(User).filter(User.uuid.in_(participantIds)).all()
+            for user in participants:
+                user.participant = idToPart[user.id]
     
         event = jsonify(event).json
         event['participants'] = participants
