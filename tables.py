@@ -19,6 +19,7 @@ Base = declarative_base()
 
 @dataclass
 class User(Base):
+    participant = None
     __tablename__ = 'users'
     id:int = Column(Integer, primary_key=True, autoincrement=True)
     name:str = Column(String, nullable=False)
@@ -153,6 +154,7 @@ class TeamMember(Base):
 
 @dataclass
 class Team(Base):
+    participant = None
     __tablename__ = "teams"
     id: int = Column(Integer, primary_key=True, autoincrement=True)
     teamName: str = Column(String, nullable=False)
