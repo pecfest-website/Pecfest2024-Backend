@@ -61,6 +61,14 @@ def createUser(body):
         if check:
             raise PecfestException(statusCode=403, message=f"Username {userUuid} is already taken")
 
+        check = session.query(User).filter(User.email == body['email']).first()
+        if check:
+            raise PecfestException(statusCode=403, message=f"Email {body['email']} is already used")
+
+        check = session.query(User).filter(User.contact == body['contact']).first()
+        if check:
+            raise PecfestException(statusCode=403, message=f"Contact {body['contact']} is already used")
+
         body['password'] = bcrypt.hashpw(body["password"].encode('utf-8'), bcrypt.gensalt())
 
         # Create a new User object
