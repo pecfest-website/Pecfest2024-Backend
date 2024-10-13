@@ -40,7 +40,7 @@ def general(logReq=False, checkToken=False, tryUser = False):
                     logger.error("Token validation failed")
                     raise PecfestException(statusCode=501, message="Session expired, login again!")
 
-            if not checkToken and tryUser:
+            if not checkToken and tryUser and token:
                 user = tokenChecker(token)
 
             # Call the original function depending on the request method
