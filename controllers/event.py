@@ -139,10 +139,10 @@ def eventDetail(body):
                     event['participated'] = True
 
         return {
-            status: "SUCCESS",
-            statusCode: 200,
-            message: "Details fetched successfully",
-            data: event
+            "status": "SUCCESS",
+            "statusCode": 200,
+            "message": "Details fetched successfully",
+            "data": event
         }
 
 
