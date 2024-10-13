@@ -36,6 +36,9 @@ def createUser(body):
         # Check for required fields
         if not body.get('name'):
             raise PecfestException(statusCode=301, message="Please provide name")
+
+        if not body.get('username'):
+            raise PecfestException(statusCode=301, message="Please provide username")
         
         if not body.get('college'):
             raise PecfestException(statusCode=301, message="Please provide college name")
@@ -52,10 +55,13 @@ def createUser(body):
         if not body.get("password"):
             raise PecfestException(statusCode=301, message="Please provide password")
 
-        body['password'] = bcrypt.hashpw(body["password"].encode('utf-8'), bcrypt.gensalt())
+        userUuid = body['username'].strip()
 
-        # Generate UUID for the new user
-        userUuid = generateUniqueUserId()
+        check = session.query(User).filter(User.uuid == userUuid).first()
+        if check:
+            raise PecfestException(statusCode=403, message=f"Username {userUuid} is already taken")
+
+        body['password'] = bcrypt.hashpw(body["password"].encode('utf-8'), bcrypt.gensalt())
 
         # Create a new User object
         newUser = User(
@@ -91,16 +97,16 @@ def createUser(body):
 
 def loginUser(body):
 
-    if not body.get("email"):
-        raise PecfestException(statusCode=301, message="Please provide email id")
+    if not body.get("username"):
+        raise PecfestException(statusCode=301, message="Please provide username")
     
     if not body.get("password"):
         raise PecfestException(statusCode=301, message="Please provide password")
 
-    email, password = body['email'], body['password']
+    username, password = body['username'].strip(), body['password']
 
     with DBConnectionManager() as session:
-        user = session.query(User).filter(User.email==email).first()
+        user = session.query(User).filter(User.uuid==username).first()
         
         if not user:
             raise PecfestException(statusCode=404, message="User not found")
