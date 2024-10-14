@@ -195,7 +195,7 @@ def register(body):
             if not members:
                 raise PecfestException(statusCode=301, message="Please provide team members")
 
-            teamMem = [TeamMember(userId=mem, memberType=MemberTypeEnum.INVITED) for mem in members]
+            teamMem = [TeamMember(userId=mem, memberType=MemberTypeEnum.ACCEPTED) for mem in members]
             teamMem.append(TeamMember(userId=user.get("uuid"), memberType=MemberTypeEnum.ACCEPTED))
             team = Team(teamName=teamName, teamSize=teamSize, members=teamMem)
 
