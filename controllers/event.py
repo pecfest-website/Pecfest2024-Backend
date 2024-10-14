@@ -148,9 +148,6 @@ def eventDetail(body):
 
 
 
-
-        
-
         
 def register(body):
     user = body['reqUser']
@@ -186,11 +183,17 @@ def register(body):
             if not teamSize:
                 raise PecfestException(statusCode=301, message="Please provide team size")
 
+            if teamSize >= event.minParticipants and teamSize <= event.maxParticipants:
+                raise PecfestException(statusCode=301, message=f"Please provide team size betwenn {event.minParticipants} and {event.maxParticipants}")
+
+            if len(members) != int(teamSize):
+                raise PecfestException(statusCode=400, message=f"Please provide members equal to {teamSize -1}")
+
             if not members:
                 raise PecfestException(statusCode=301, message="Please provide team members")
 
             teamMem = [TeamMember(userId=mem, memberType=MemberTypeEnum.INVITED) for mem in members]
-            teamMem.append(TeamMember(userId=user.uuid, memberType=MemberTypeEnum.ACCEPTED))
+            teamMem.append(TeamMember(userId=user.get("uuid"), memberType=MemberTypeEnum.ACCEPTED))
             team = Team(teamName=teamName, teamSize=teamSize, members=teamMem)
 
             session.add(team)
