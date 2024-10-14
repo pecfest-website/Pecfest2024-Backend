@@ -3,6 +3,7 @@ from sqlalchemy.orm import joinedload, noload, with_loader_criteria
 from util.exception import PecfestException
 from flask import jsonify
 from util.gcb import uploadImage
+from util.loggerSetup import logger
 
 def formatEvent(event, tags):
     event.startDate = event.startDate.strftime("%Y-%m-%d") if event.startDate else None
