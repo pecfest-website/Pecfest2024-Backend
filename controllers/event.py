@@ -186,7 +186,7 @@ def register(body):
             if teamSize >= event.minParticipants and teamSize <= event.maxParticipants:
                 raise PecfestException(statusCode=301, message=f"Please provide team size betwenn {event.minParticipants} and {event.maxParticipants}")
 
-            if (len(members) -1) != int(teamSize):
+            if len(members) != (int(teamSize) - 1):
                 raise PecfestException(statusCode=400, message=f"Please provide members equal to {teamSize -1}")
 
             if not members:
