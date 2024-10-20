@@ -197,6 +197,11 @@ def register(body):
             if not members:
                 raise PecfestException(statusCode=301, message="Please provide team members")
 
+            checkingMem = session.query(User).filter(User.uuid.in_(members)).all()
+
+            if len(checkingMem) != (int(teamSize) - 1):
+                raise PecfestException(statusCode=400, message="Invalid member username provided")
+
             teamMem = [TeamMember(userId=mem, memberType=MemberTypeEnum.ACCEPTED) for mem in members]
             teamMem.append(TeamMember(userId=user.get("uuid"), memberType=MemberTypeEnum.ACCEPTED))
             team = Team(teamName=teamName, teamSize=teamSize, members=teamMem)
