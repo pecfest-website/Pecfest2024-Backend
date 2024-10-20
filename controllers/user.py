@@ -1,4 +1,4 @@
-from tables import DBConnectionManager, User
+from tables import DBConnectionManager, User, TeamMember, Team, Participant
 from util.exception import PecfestException
 from util.loggerSetup import logger
 from flask import jsonify
@@ -133,4 +133,118 @@ def loginUser(body):
             "data": {
                 "token": token
             }
+        }
+
+def userInfo(body):
+    reqUser = body.get("reqUser")
+
+    if not reqUser:
+        raise PecfestException(statusCode=400, message="Invalid Request")
+
+    uuid = reqUser.get("uuid")
+
+    with DBConnectionManager() as session:
+        # Fetch the user by uuid
+        user = session.query(User).filter(User.uuid == uuid).first()
+
+        if not user:
+            raise PecfestException(statusCode=401, message="Invalid user")
+
+        # Fetch all teams the user is invited to with event information in one query
+        invitedTeams = session.query(Team, Event).join(TeamMember).join(Event).filter(
+            TeamMember.userId == uuid,
+            TeamMember.memberType == MemberTypeEnum.INVITED
+        ).all()
+
+        # Fetch all teams where the user is an accepted member with event information in one query
+        acceptedTeams = session.query(Team, Event).join(TeamMember).join(Event).filter(
+            TeamMember.userId == uuid,
+            TeamMember.memberType == MemberTypeEnum.ACCEPTED
+        ).all()
+
+        # Combine team IDs from both invited and accepted teams
+        allTeamIds = list(set([team.id for team, _ in invitedTeams] + [team.id for team, _ in acceptedTeams]))
+
+        # Fetch accepted members for all teams in one query
+        acceptedMembers = session.query(TeamMember, User).join(User).filter(
+            TeamMember.teamId.in_(allTeamIds),
+            TeamMember.memberType == MemberTypeEnum.ACCEPTED
+        ).all()
+
+        # Create a dictionary to store accepted members by team ID
+        acceptedMembersByTeam = {}
+        for teamMember, user in acceptedMembers:
+            if teamMember.teamId not in acceptedMembersByTeam:
+                acceptedMembersByTeam[teamMember.teamId] = []
+            acceptedMembersByTeam[teamMember.teamId].append({
+                "name": user.name,
+                "email": user.email,
+                "contact": user.contact
+            })
+
+        # Prepare invitedTeamsData
+        invitedTeamsData = []
+        for team, event in invitedTeams:
+            invitedTeamsData.append({
+                "teamName": team.teamName,
+                "eventName": event.name,
+                "eventId": event.id,
+                "eventType": event.participationType.name,  # Event Type (Single or Team)
+                "teamSize": team.teamSize,
+                "teamId": team.id,
+                "acceptedMembers": acceptedMembersByTeam.get(team.id, []),
+                "startTime": event.startTime,
+                "startDate": event.startDate,
+                "endTime": event.endTime,
+                "endDate": event.endDate
+            })
+
+        # Prepare acceptedAndParticipantEvents (combining accepted teams and participant events)
+        acceptedAndParticipantEvents = []
+        
+        # Process accepted teams
+        for team, event in acceptedTeams:
+            acceptedAndParticipantEvents.append({
+                "teamName": team.teamName,
+                "eventName": event.name,
+                "eventId": event.id,
+                "eventType": event.participationType.name,  # Event Type (Single or Team)
+                "teamSize": team.teamSize,
+                "teamId": team.id,
+                "acceptedMembers": acceptedMembersByTeam.get(team.id, []),
+                "startTime": event.startTime,
+                "startDate": event.startDate,
+                "endTime": event.endTime,
+                "endDate": event.endDate
+            })
+
+        # Find all events the user is part of (as a participant) in one query
+        participantEvents = session.query(Event).join(Participant).filter(
+            Participant.participantId == uuid
+        ).all()
+
+        # Add participant events (individual participation) to acceptedAndParticipantEvents
+        for event in participantEvents:
+            acceptedAndParticipantEvents.append({
+                "eventName": event.name,
+                "eventId": event.id,
+                "eventType": event.participationType.name,  # Event Type (Single or Team)
+                "startTime": event.startTime,
+                "startDate": event.startDate,
+                "endTime": event.endTime,
+                "endDate": event.endDate
+            })
+
+        # Prepare response data
+        data = {
+            "user": user.to_dict(),
+            "invitedTeams": invitedTeamsData,
+            "acceptedAndParticipantEvents": acceptedAndParticipantEvents
+        }
+
+        return {
+            "status": "SUCCESS",
+            "statusCode": 200,
+            "message": "User info fetched successfully",
+            "data": data
         }

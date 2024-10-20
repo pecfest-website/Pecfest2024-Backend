@@ -114,5 +114,11 @@ def loginUser(body, *args, **kwargs):
     result = user.loginUser(body)
     return result, 200
 
+@app.route('/user/info', methods=['POST'])
+@general(logReq = True, checkToken = True)
+def loginUser(body, *args, **kwargs):
+    result = user.userInfo(body)
+    return result, 200
+
 if __name__ == '__main__':
     app.run(debug=True)
