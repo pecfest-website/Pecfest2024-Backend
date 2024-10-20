@@ -128,10 +128,10 @@ def eventDetail(body):
         event['participated'] = False
 
         if body.get("reqUser") and body.get("reqUser").get("userId"):
-            userId = body.get("reqUser").get("userId")
+            userId = body.get("reqUser").get("uuid")
             participants = session.query(Participant.participantId).filter(Participant.eventId == eventId).all()
             participants = [t[0] for t in participants]
-            if Event.participationType == ParticipationTypeEnum.TEAM:
+            if event['participationType'] == ParticipationTypeEnum.TEAM.name:
                 joined = session.query(TeamMember).filter(TeamMember.teamId.in_(participants), TeamMember.memberType == MemberTypeEnum.ACCEPTED, TeamMember.userId == userId).first()
                 if joined:
                     event['participated'] = True
