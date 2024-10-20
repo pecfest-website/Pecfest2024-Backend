@@ -1,4 +1,4 @@
-from tables import Event, DBConnectionManager, Team, User, ParticipationTypeEnum, PaymentTypeEnum, Participant, Team, TeamMember, MemberTypeEnum, Tag
+from tables import Event, DBConnectionManager, Team, User, ParticipationTypeEnum, PaymentTypeEnum, Participant, Team, TeamMember, MemberTypeEnum, Tag, EventTypeEnum
 from sqlalchemy.orm import joinedload, noload, with_loader_criteria
 from util.exception import PecfestException
 from flask import jsonify
