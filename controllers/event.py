@@ -165,10 +165,7 @@ def register(body):
     with DBConnectionManager() as session:
         event = session.query(Event).filter(Event.id == eventId).first()
         if not event:
-            raise PecfestException(statusCode=404, message="No such event exists")
-
-        if event.provideAccommodation and not accomo:
-            raise PecfestException(statusCode=301, message="Please provide accomodation field")            
+            raise PecfestException(statusCode=404, message="No such event exists")          
 
         participant = Participant(eventId=eventId)
         if event.provideAccommodation:
