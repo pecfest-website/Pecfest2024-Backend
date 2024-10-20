@@ -167,15 +167,15 @@ def register(body):
         if not event:
             raise PecfestException(statusCode=404, message="No such event exists")
 
-        if event.provideAccomodations and not accomo:
+        if event.provideAccommodation and not accomo:
             raise PecfestException(statusCode=301, message="Please provide accomodation field")            
 
         participant = Participant(eventId=eventId)
-        if event.provideAccomodations:
+        if event.provideAccommodation:
             participant.requireAccomodations=accomo
         else:
             participant.requireAccomodations=False
-            
+
         if event.participationType == ParticipationTypeEnum.SINGLE:
             participant.participantId = userId
         else:
