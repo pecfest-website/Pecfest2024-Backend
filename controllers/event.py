@@ -131,8 +131,7 @@ def eventDetail(body):
             userId = body.get("reqUser").get("userId")
             participants = session.query(Participant.participantId).filter(Participant.eventId == eventId).all()
             if Event.participationType == ParticipationTypeEnum.TEAM:
-                teams = session.query(Team).filter(Team.id.in_(participants)).all()
-                joined = session.query(TeamMember).filter(TeamMember.teamId.in_(teams), TeamMember.memberType == MemberTypeEnum.ACCEPTED, TeamMember.userId == userId).first()
+                joined = session.query(TeamMember).filter(TeamMember.teamId.in_(participants), TeamMember.memberType == MemberTypeEnum.ACCEPTED, TeamMember.userId == userId).first()
                 if joined:
                     event['participated'] = True
             else:
