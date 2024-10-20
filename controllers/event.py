@@ -162,15 +162,20 @@ def register(body):
     if not eventId:
         raise PecfestException(statusCode=301, message="Please provide event id")
 
-    if not accomo:
-        raise PecfestException(statusCode=301, message="Please provide accomodation field")
-
     with DBConnectionManager() as session:
         event = session.query(Event).filter(Event.id == eventId).first()
         if not event:
             raise PecfestException(statusCode=404, message="No such event exists")
 
-        participant = Participant(eventId=eventId, requireAccomodations=accomo)
+        if event.provideAccomodations and not accomo:
+            raise PecfestException(statusCode=301, message="Please provide accomodation field")            
+
+        participant = Participant(eventId=eventId)
+        if event.provideAccomodations:
+            participant.requireAccomodations=accomo
+        else:
+            participant.requireAccomodations=False
+            
         if event.participationType == ParticipationTypeEnum.SINGLE:
             participant.participantId = userId
         else:
