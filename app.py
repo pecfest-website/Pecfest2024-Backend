@@ -116,7 +116,7 @@ def loginUser(body, *args, **kwargs):
 
 @app.route('/user/info', methods=['POST'])
 @general(logReq = True, checkToken = True)
-def loginUser(body, *args, **kwargs):
+def InfoUser(body, *args, **kwargs):
     result = user.userInfo(body)
     return result, 200
 
