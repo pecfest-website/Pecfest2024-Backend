@@ -195,9 +195,9 @@ def userInfo(body):
                 "teamSize": team.teamSize,
                 "teamId": team.id,
                 "acceptedMembers": acceptedMembersByTeam.get(team.id, []),
-                "startTime": event.startTime,
+                "startTime": event.startTime.strftime("%H:%M") if event.startTime else None,
                 "startDate": event.startDate,
-                "endTime": event.endTime,
+                "endTime": event.endTime.strftime("%H:%M") if event.startTime else None,
                 "endDate": event.endDate
             })
 
@@ -214,9 +214,9 @@ def userInfo(body):
                 "teamSize": team.teamSize,
                 "teamId": team.id,
                 "acceptedMembers": acceptedMembersByTeam.get(team.id, []),
-                "startTime": event.startTime,
+                "startTime": event.startTime.strftime("%H:%M") if event.startTime else None,
                 "startDate": event.startDate,
-                "endTime": event.endTime,
+                "endTime": event.endTime.strftime("%H:%M") if event.startTime else None,
                 "endDate": event.endDate
             })
 
@@ -231,9 +231,9 @@ def userInfo(body):
                 "eventName": event.name,
                 "eventId": event.id,
                 "eventType": event.participationType.name,  # Event Type (Single or Team)
-                "startTime": event.startTime,
+                "startTime": event.startTime.strftime("%H:%M") if event.startTime else None,
                 "startDate": event.startDate,
-                "endTime": event.endTime,
+                "endTime": event.endTime.strftime("%H:%M") if event.startTime else None,
                 "endDate": event.endDate
             })
 
