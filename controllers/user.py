@@ -1,4 +1,4 @@
-from tables import DBConnectionManager, User, TeamMember, Team, Participant
+from tables import DBConnectionManager, User, TeamMember, Team, Participant, Event
 from util.exception import PecfestException
 from util.loggerSetup import logger
 from flask import jsonify
