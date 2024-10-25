@@ -151,13 +151,13 @@ def userInfo(body):
             raise PecfestException(statusCode=401, message="Invalid user")
 
         # Fetch all teams the user is invited to with event information in one query
-        invitedTeams = session.query(Team, Event).join(TeamMember).join(Event).filter(
+        invitedTeams = session.query(Team, Event).join(TeamMember, TeamMember.teamId == Team.id).join(Participant, Participant.participantId == Team.id).join(Event.id == Participant.eventId).filter(
             TeamMember.userId == uuid,
             TeamMember.memberType == MemberTypeEnum.INVITED
         ).all()
 
         # Fetch all teams where the user is an accepted member with event information in one query
-        acceptedTeams = session.query(Team, Event).join(TeamMember).join(Event).filter(
+        acceptedTeams = session.query(Team, Event).join(TeamMember, TeamMember.teamId == Team.id).join(Participant, Participant.participantId == Team.id).join(Event.id == Participant.eventId).filter(
             TeamMember.userId == uuid,
             TeamMember.memberType == MemberTypeEnum.ACCEPTED
         ).all()
