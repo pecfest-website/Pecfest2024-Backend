@@ -167,6 +167,8 @@ class Team(Base):
 class Sponser(Base):
     __tablename__ = "sponsers"
     id: int = Column(Integer, primary_key=True, autoincrement=True)
+    name : str = Column(String)
+    title : str = Column(String)
     link : str = Column(String, nullable = False)
     typeId: int = Column(Integer, ForeignKey('sponserTypes.id') ,nullable = False)
     isDeleted : bool = Column(Boolean, default=False, nullable=False)
