@@ -81,7 +81,7 @@ def deleteType(body):
 
 def listSponser():
     with DBConnectionManager() as session:
-        sponsers = session.query(SponserType).filter(SponserType.isDeleted == False).options(joinedload(SponserType.sponsers), with_loader_criteria(Sponser, Sponser.isDeleted == False)).all()
+        sponsers = session.query(SponserType).filter(SponserType.isDeleted == False).options(joinedload(SponserType.sponsers), with_loader_criteria(Sponser, Sponser.isDeleted == False)).order_by(asc(SponserType.priority)).all()
         return {"status": "SUCCESS", 
             "statusCode": 200, 
             "message": "Sponsers Fetched successfully",
