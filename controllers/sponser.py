@@ -1,4 +1,5 @@
 from tables import SponserType, Sponser, DBConnectionManager
+from sqlalchemy import desc
 from sqlalchemy.orm import joinedload, with_loader_criteria
 from util.exception import PecfestException
 from util.loggerSetup import logger
@@ -81,7 +82,7 @@ def deleteType(body):
 
 def listSponser():
     with DBConnectionManager() as session:
-        sponsers = session.query(SponserType).filter(SponserType.isDeleted == False).options(joinedload(SponserType.sponsers), with_loader_criteria(Sponser, Sponser.isDeleted == False)).order_by(asc(SponserType.priority)).all()
+        sponsers = session.query(SponserType).filter(SponserType.isDeleted == False).options(joinedload(SponserType.sponsers), with_loader_criteria(Sponser, Sponser.isDeleted == False)).order_by(desc(SponserType.priority)).all()
         return {"status": "SUCCESS", 
             "statusCode": 200, 
             "message": "Sponsers Fetched successfully",
