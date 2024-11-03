@@ -64,7 +64,7 @@ def getParticipants(session, event):
             participants.append(tmp)
 
     else:
-        users = session.query(User).filter(User.uuid.in_(participantIds)).all()
+        users = session.query(User).filter(User.id.in_(participantIds)).all()
         for user in users:
             participant = idToPart[user.uuid]
             tmp = jsonify(user).json
