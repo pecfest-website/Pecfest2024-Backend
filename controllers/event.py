@@ -57,7 +57,7 @@ def getParticipants(session, event):
         for part in teams: 
             for mem in part.members:
                 mem.memberType = mem.memberType.name
-            participant = idToPart[str(part.id)]
+            participant = idToPart[int(part.id)]
             tmp = jsonify(part).json
             tmp['requireAccomodations'] = participant.requireAccomodations
             tmp['paymentId'] = participant.paymentId
