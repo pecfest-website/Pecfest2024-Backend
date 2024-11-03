@@ -48,7 +48,7 @@ def getParticipants(session, event):
     idToPart = {}
     for participant in event.participants:
         participantIds.append(participant.participantId)
-        idToPart[participant.participantId] = participant
+        idToPart[int(participant.participantId)] = participant
 
     participants = []
 
