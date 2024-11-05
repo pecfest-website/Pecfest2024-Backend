@@ -129,7 +129,7 @@ def eventDetail(body):
 
         if body.get("reqUser") and body.get("reqUser").get("uuid"):
             userId = body.get("reqUser").get("uuid")
-            userId2 = body.get("reqUser").get("userId")
+            userId2 = str(body.get("reqUser").get("userId"))
             participants = session.query(Participant.participantId).filter(Participant.eventId == eventId).all()
             participants = [t[0] for t in participants]
             if event['participationType'] == ParticipationTypeEnum.TEAM.name:
