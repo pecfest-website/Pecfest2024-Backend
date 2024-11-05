@@ -222,7 +222,8 @@ def userInfo(body):
 
         # Find all events the user is part of (as a participant) in one query
         participantEvents = session.query(Event).join(Participant).filter(
-            Participant.participantId == user.id
+            Participant.participantId == user.id,
+            Event.participationType == ParticipationTypeEnum.SINGLE
         ).all()
 
         # Add participant events (individual participation) to acceptedAndParticipantEvents
