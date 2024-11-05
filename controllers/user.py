@@ -152,14 +152,14 @@ def userInfo(body):
 
         # Fetch all teams the user is invited to with event information in one query
         invitedTeams = session.query(Team, Event).join(TeamMember, TeamMember.teamId == Team.id).join(Participant, Participant.participantId == Team.id).join(Event, Event.id == Participant.eventId).filter(
-            TeamMember.userId == uuid,
+            TeamMember.userId == user.id,
             TeamMember.memberType == MemberTypeEnum.INVITED,
             Event.participationType == ParticipationTypeEnum.TEAM
         ).all()
 
         # Fetch all teams where the user is an accepted member with event information in one query
         acceptedTeams = session.query(Team, Event).join(TeamMember, TeamMember.teamId == Team.id).join(Participant, Participant.participantId == Team.id).join(Event, Event.id == Participant.eventId).filter(
-            TeamMember.userId == uuid,
+            TeamMember.userId == user.id,
             TeamMember.memberType == MemberTypeEnum.ACCEPTED,
             Event.participationType == ParticipationTypeEnum.TEAM
         ).all()
