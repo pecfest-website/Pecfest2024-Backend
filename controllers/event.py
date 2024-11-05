@@ -127,8 +127,8 @@ def eventDetail(body):
         event = jsonify(event).json
         event['participated'] = False
 
-        if body.get("reqUser") and body.get("reqUser").get("userId"):
-            userId = body.get("reqUser").get("id")
+        if body.get("reqUser") and body.get("reqUser").get("uuid"):
+            userId = body.get("reqUser").get("uuid")
             participants = session.query(Participant.participantId).filter(Participant.eventId == eventId).all()
             participants = [t[0] for t in participants]
             if event['participationType'] == ParticipationTypeEnum.TEAM.name:
