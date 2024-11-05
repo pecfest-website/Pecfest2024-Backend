@@ -129,6 +129,7 @@ def eventDetail(body):
 
         if body.get("reqUser") and body.get("reqUser").get("uuid"):
             userId = body.get("reqUser").get("uuid")
+            userId2 = body.get("reqUser").get("userId")
             participants = session.query(Participant.participantId).filter(Participant.eventId == eventId).all()
             participants = [t[0] for t in participants]
             if event['participationType'] == ParticipationTypeEnum.TEAM.name:
@@ -136,7 +137,7 @@ def eventDetail(body):
                 if joined:
                     event['participated'] = True
             else:
-                if userId in participants:
+                if userId2 in participants:
                     event['participated'] = True
 
         return {
@@ -145,10 +146,6 @@ def eventDetail(body):
             "message": "Details fetched successfully",
             "data": event
         }
-
-
-
-
         
 def register(body):
     user = body['reqUser']
